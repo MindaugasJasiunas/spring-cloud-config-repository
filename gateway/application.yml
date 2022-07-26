@@ -48,6 +48,13 @@ spring:
         filters[0]: RemoveRequestHeader=Cookie
         filters[1]: RewritePath=/users-service/(?< segment>.*), /${segment}
 
+  # rabbitMQ config for Spring Cloud Bus to be able to communicate
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+
 eureka:
   client:
     service-url:
