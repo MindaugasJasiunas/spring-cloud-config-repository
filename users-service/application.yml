@@ -1,0 +1,24 @@
+server:
+  port: ${PORT:0}
+
+spring:
+  application:
+    name: users-service
+
+  r2dbc:
+    database: ouruserdb
+    url: r2dbc:postgresql://0.0.0.0:5432/${spring.r2dbc.database}
+    username: root
+    password: rootroot
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+  instance:
+    instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
+
+jwt:
+  secretKey: SuperLongAndVerySecureKey-[].~^+$&4
+  refreshTokenExpirationAfterMilliseconds: 86400000
+  accessTokenExpirationAfterMilliseconds: 420000

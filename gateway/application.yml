@@ -1,0 +1,54 @@
+server:
+  port: 9090
+
+spring:
+  application:
+    name: gateway
+
+  # AUTOMATIC GATEWAY LOCATOR ROUTING
+  # automatically maps and routes HTTP requests to destination service if request provided using service name ex.: http://localhost:9090/{registered-service-name}/{url-inside-service}
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true
+          # to use lower case in URL ex.: http://localhost:9090/users-service/...
+          lower-case-service-id: true
+
+      # MANUAL GATEWAY LOCATOR ROUTING
+      # predicate makes path 'localhost:9090/' access to uri 'localhost:9090/users-service/'
+      routes[0]:
+        id: users-home
+        ## registered service name OR api address OR host name
+        uri: lb://users-service/
+        ##java8 predicates used to match HTTP request using headers or method and route to destination (its like if statement condition)
+        ##if all predicate conditions match - route to url: lb://usersservice/api/v1/users/' (uri+path)
+        predicates[0]: Path=/
+        ##=GET, POST, PUT, DELETE
+        predicates[1]: Method=GET
+        ##filters - default filter method but we can write our own
+        filters[0]: RemoveRequestHeader=Cookie
+      #        filters[1]: RewritePath=/users-service/(?<segment>.*), /${segment}
+
+      # user login route
+      routes[1]:
+        id: user-signin
+        uri: lb://users-service
+        predicates[0]: Path=/users-service/login
+        predicates[1]: Method=POST
+        filters[0]: RemoveRequestHeader=Cookie
+        filters[1]: RewritePath=/users-service/(?< segment>.*), /${segment}
+
+      # user register route
+      routes[2]:
+        id: user-signup
+        uri: lb://users-service
+        predicates[0]: Path=/users-service/register
+        predicates[1]: Method=POST
+        filters[0]: RemoveRequestHeader=Cookie
+        filters[1]: RewritePath=/users-service/(?< segment>.*), /${segment}
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
