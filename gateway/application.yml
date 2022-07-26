@@ -53,7 +53,8 @@ spring:
     host: localhost
     port: 5672
     username: guest
-    password: guest
+    # password: guest
+    password: '{cipher}AQC9lpXh3COldXHmKD2LEkHjtRpylXnMu9j9ikee+72wUg/Qj70CdZyRgThT7+DQF30JuPzw5UdVYayDYD4Hsw0iXYoDKIYpEJy31mbUuHPXVkuXS73PgCQZ6SvKN1HpXLE86S1Buvmp0TE5abbiebckJrXTNSDgYV7gvVxp1mjX47egwdWVZpe5DmifiLrnBOMVJffuczhGYFpeykEPPTPzLGqA7hJXdB+SR96RdBYS9V9HW/IIAjhE+bbu8h2mW0m72Gz0fDH7D8ppzk3PkGJZMoGN9zPlJiK1Z/m6IPP4Q1E1SnawVDIOkD1qZMV/+9e951Dz7YhUa61gUVF+een1QnZy3/TeplaLvmTIYy78lfs/HzpS0DMHtQuJK/jhM18='
 
 eureka:
   client:
