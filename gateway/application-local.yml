@@ -1,21 +1,20 @@
-server:
-  port: 9090
+# port where all requests will be coming
+server: port:9090
+eureka:
+  client:
+    service-url: defaultZone:http://localhost:8761/eureka, http://localhost2:8762/eureka, http://localhost3:8763/eureka
 
 spring:
-  application:
-    name: gateway
-  # rabbitMQ config for Spring Cloud Bus to be able to communicate
-  rabbitmq:
-    host: localhost
-    port: 5672
-    username: guest
-    password: guest
-  config:
-    import: optional:configserver:http://localhost:8888
+  application: name:gateway
+  # Spring Cloud Config - disable when using locally
+  #spring.config.import=optional:configserver:http://localhost:8888
+  # disable cloud config
   cloud:
-    config:
-      enabled: true
-    # AUTOMATIC GATEWAY LOCATOR ROUTING - turned off
+    config: enabled:false
+    # connect to Eureka
+    discovery: enabled:true
+
+    # AUTOMATIC GATEWAY LOCATOR ROUTING
     # automatically maps and routes HTTP requests to destination service if request provided using service name ex.: http://localhost:9090/{registered-service-name}/{url-inside-service}
     gateway:
       discovery:
@@ -23,21 +22,19 @@ spring:
           enabled: false
           # to use lower case in URL ex.: http://localhost:9090/users-service/...
           lower-case-service-id: true
-    
+
       # MANUAL GATEWAY LOCATOR ROUTING
+      # predicate makes path 'localhost:9090/' access to uri 'localhost:9090/users-service/'
       routes[0]:
-        # predicate makes path 'localhost:9090/' access to uri 'localhost:9090/users-service/'
         id: users-home
-        # registered service name OR api address OR host name
+        ## registered service name OR api address OR host name
         uri: lb://users-service/
-        # java8 predicates used to match HTTP request using headers or method and route to destination (its like if statement condition)
+        ##java8 predicates used to match HTTP request using headers or method and route to destination (its like if statement condition)
         predicates[0]: Path=/
-        # =GET, POST, PUT, DELETE
+        ##=GET, POST, PUT, DELETE
         predicates[1]: Method=GET
-        # filters                                default filter method but we can write our own
+        ##filters                                default filter method but we can write our own
         filters[0]: RemoveRequestHeader=Cookie
-        #filters[1]=RewritePath=/users-service/(?<segment>.*), /${segment}
-          
 
       # user login route
       routes[1]:
@@ -47,7 +44,6 @@ spring:
         predicates[1]: Method=POST
         filters[0]: RemoveRequestHeader=Cookie
 
-
       # user register route
       routes[2]:
         id: user-signup
@@ -55,7 +51,6 @@ spring:
         predicates[0]: Path=/register
         predicates[1]: Method=POST
         filters[0]: RemoveRequestHeader=Cookie
-
 
       # get users - needs to have Authorization header
       routes[3]:
@@ -70,7 +65,6 @@ spring:
         # rewrite request from localhost:9090/users to localhost:9090/api/v1/users -> gateway will return our 'user-service/api/v1/users'
         filters[1]: RewritePath=/users, /api/v1/users
 
-
       # user get access token from refresh token route
       routes[4]:
         id: user-get-access-token
@@ -80,9 +74,8 @@ spring:
         predicates[2]: Header=Authorization, Bearer (.*)
         filters[0]: RemoveRequestHeader=Cookie
 
-      
       # user get user by publicID route
-      routes[5]: 
+      routes[5]:
         id: users-get-user-by-publicID
         uri: lb://users-service
         predicates[0]: Path=/users/**
@@ -91,17 +84,8 @@ spring:
         filters[0]: RemoveRequestHeader=Cookie
         filters[1]: RewritePath=/users/(?<segment>.*), /api/v1/users/${segment}
 
-
-
-eureka:
-  client: 
-    service-url:
-      defaultZone: http://localhost:8761/eureka, http://localhost2:8762/eureka, http://localhost3:8763/eureka
-
-
-
-# trace gateway logs - debugging
-logging: 
+# trace gateway logs
+logging:
   level:
     org.springframework.cloud.gateway: DEBUG
     reactor.netty.http.client: DEBUG
