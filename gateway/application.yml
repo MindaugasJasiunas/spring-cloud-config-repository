@@ -92,6 +92,39 @@ spring:
         filters[1]: RewritePath=/users/(?<segment>.*), /api/v1/users/${segment}
 
 
+      # Package(Parcel) service
+
+      # get all packages
+      routes[6]:
+        id: get-all-parcels
+        uri: lb://packages-service
+        predicates[0]: Path=/parcels
+        predicates[1]: Method=GET
+       #predicates[2]: Header=Authorization, Bearer (.*)
+        filters[0]: RemoveRequestHeader=Cookie
+
+
+      # package tracking
+      routes[7]:
+        id: get-package-by-trackingNumber
+        uri: lb://packages-service
+        predicates[0]: Path=/tracking/**
+        predicates[1]: Method=GET
+       #predicates[2]: Header=Authorization, Bearer (.*)
+        filters[0]: RemoveRequestHeader=Cookie
+        filters[1]: RewritePath=/tracking/(?<segment>.*), /parcels/${segment}
+
+
+      # submit new package
+      routes[8]:
+        id: submit-new-package
+        uri: lb://packages-service
+        predicates[0]: Path=/new
+        predicates[1]: Method=POST
+       #predicates[2]: Header=Authorization, Bearer (.*)
+        filters[0]: RemoveRequestHeader=Cookie
+        filters[1]: RewritePath=/new, /parcels/submitNewPackage
+
 
 eureka:
   client: 
