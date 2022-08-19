@@ -103,7 +103,7 @@ spring:
         predicates[1]: Method=GET
        #predicates[2]: Header=Authorization, Bearer (.*)
         filters[0]: RemoveRequestHeader=Cookie
-        filters[1]: RewritePath=/tracking/(?<segment>.*), /parcels/${segment}
+        filters[1]: RewritePath=/tracking/(?<segment>.*), /parcels/tracking/${segment}
 
       # submit new package
       routes[8]:
@@ -115,6 +115,15 @@ spring:
         filters[0]: RemoveRequestHeader=Cookie
         filters[1]: RewritePath=/new, /parcels/submitNewPackage
 
+      # get parcels count
+      routes[9]:
+        id: submit-new-package
+        uri: lb://packages-service
+        predicates[0]: Path=/parcels/count
+        predicates[1]: Method=GET
+        #predicates[2]: Header=Authorization, Bearer (.*)
+        filters[0]: RemoveRequestHeader=Cookie
+        #filters[1]: RewritePath=/new, /parcels/submitNewPackage
 
 # trace gateway logs
 logging:
